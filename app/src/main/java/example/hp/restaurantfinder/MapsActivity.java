@@ -50,7 +50,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final String LATITUDE_KEY = "lat";
     private static final String LONGITUDE_KEY = "lng";
     private static final String LOCATION = "location";
-    private static final String API_KEY = "AIzaSyCT4GK9ZJ86lt9czWuwYGfjXa7BPIDedP0";
+    private static final String API_KEY = "b77d02706d610120848d0c37696477c4";
     private static final String ORIGIN = "origin=";
     private static final String DESTINATION = "destination=";
     private static final String SENSOR_FALSE = "sensor=false";
