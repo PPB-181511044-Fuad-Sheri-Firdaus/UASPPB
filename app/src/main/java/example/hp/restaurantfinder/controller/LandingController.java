@@ -1,0 +1,155 @@
+package example.hp.restaurantfinder.controller;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import example.hp.restaurantfinder.ListingActivity;
+import example.hp.restaurantfinder.R;
+import example.hp.restaurantfinder.adapter.CollectionsAdapter;
+import example.hp.restaurantfinder.contract.LandingContract;
+
+import example.hp.restaurantfinder.databinding.LandingControllerBinding;
+import example.hp.restaurantfinder.model.CollectionResponse;
+import example.hp.restaurantfinder.presenter.LandingPresenter;
+import com.hannesdorfmann.mosby3.mvp.conductor.lce.MvpLceController;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
+
+public class LandingController extends MvpLceController<LinearLayout, List<CollectionResponse>,
+        LandingContract.View, LandingPresenter> implements LandingContract.View {
+
+    private static final String TAG = LandingController.class.getName();
+    private static final String CITY_ID = "city_id";
+    private static final String COLLECTION_ID = "collection_id";
+
+    private Bundle bundle;
+    private LandingControllerBinding binding;
+    private int cityId;
+    private RequestQueue queue;
+    private CollectionsAdapter adapter;
+    private RecyclerView recyclerView;
+    private List<CollectionResponse> collectionList;
+    private CompositeDisposable disposable;
+    private int collectionId;
+
+    public LandingController(Bundle bundle) {
+        super(bundle);
+        this.bundle = bundle;
+    }
+
+    @Override
+    protected String getErrorMessage(Throwable e, boolean pullToRefresh) {
+        return e.getMessage();
+    }
+
+    @NonNull
+    @Override
+    protected View onCreateView(@NonNull LayoutInflater inflater, @NonNull ViewGroup container) {
+        binding = LandingControllerBinding.inflate(inflater, container, false);
+        cityId = bundle.getInt(CITY_ID);
+        collectionList = new ArrayList<>();
+        disposable = new CompositeDisposable();
+        queue = Volley.newRequestQueue(Objects.requireNonNull(getApplicationContext()));
+        return binding.getRoot();
+    }
+
+    @Override
+    protected void onAttach(@NonNull View view) {
+        super.onAttach(view);
+        initRecyclerView();
+        loadData(false);
+    }
+
+    @Override
+    protected void onDetach(@NonNull View view) {
+        super.onDetach(view);
+    }
+
+    @NonNull
+    @Override
+    public LandingPresenter createPresenter() {
+        return new LandingPresenter();
+    }
+
+    @Override
+    public void loadData(boolean pullToRefresh) {
+        presenter.fetchCollections(queue, cityId);
+    }
+
+    @Override
+    public void setData(List<CollectionResponse> data) {
+        collectionList.clear();
+        collectionList.addAll(data);
+        adapter.setData(data);
+        adapter.notifyDataSetChanged();
+    }
+
+    @Override
+    protected int getContentViewId() {
+        return binding.contentView.getId();
+    }
+
+    @Override
+    protected int getErrorViewId() {
+        return binding.errorView.getId();
+    }
+
+    @Override
+    protected int getLoadingViewId() {
+        return binding.loadingView.getId();
+    }
+
+    @Override
+    public void showLoading(boolean pullToRefresh) {
+        super.showLoading(pullToRefresh);
+    }
+
+    @Override
+    public void showContent() {
+        super.showContent();
+    }
+
+    private void initRecyclerView() {
+        adapter = new CollectionsAdapter(getActivity());
+        recyclerView = binding.contentView.findViewById(R.id.rv_collections);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.setAdapter(adapter);
+        subscribeToCollectionItemClicked(adapter.getAdapterCollectionClickSubject());
+    }
+
+    private void subscribeToCollectionItemClicked(PublishSubject<Integer> collectionItemClickSubject) {
+        disposable.add(collectionItemClickSubject.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(id -> {
+                    collectionId = id;
+                    launchListingActivity();
+                }, e -> {
+                    Log.d(TAG, Objects.requireNonNull(e.getMessage()));
+                }));
+    }
+
+    private void launchListingActivity() {
+        Intent intent = new Intent(getActivity(), ListingActivity.class);
+        intent.putExtra(CITY_ID, cityId);
+        intent.putExtra(COLLECTION_ID, collectionId);
+        startActivity(intent);
+    }
+}

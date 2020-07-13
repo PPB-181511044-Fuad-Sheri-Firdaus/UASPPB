@@ -1,0 +1,28 @@
+package example.hp.restaurantfinder.contract;
+
+import com.android.volley.RequestQueue;
+import example.hp.restaurantfinder.model.SearchResponse;
+import com.hannesdorfmann.mosby3.mvp.MvpBasePresenter;
+import com.hannesdorfmann.mosby3.mvp.lce.MvpLceView;
+
+import java.util.List;
+
+public interface ListingContract {
+
+    interface Model {
+        void getData(RequestQueue queue, int cityId, int collectionId, String order, onFinishedListener listener);
+
+        interface onFinishedListener {
+            void onFinished(List<SearchResponse> searchResponseList);
+
+            void onFailed(Throwable t);
+        }
+    }
+
+    interface View extends MvpLceView<List<SearchResponse>> {
+    }
+
+    abstract class Presenter extends MvpBasePresenter<View> {
+        public abstract void fetchData(RequestQueue queue, int cityId, int collectionId, String order);
+    }
+}

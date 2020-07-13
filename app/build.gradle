@@ -1,0 +1,91 @@
+apply plugin: 'com.android.application'
+apply plugin: 'com.google.gms.google-services'
+
+android {
+    dataBinding {
+        enabled = true
+    }
+    compileSdkVersion 29
+    buildToolsVersion "29.0.3"
+
+    defaultConfig {
+        applicationId "example.hp.restaurantfinder"
+        minSdkVersion 24
+        targetSdkVersion 29
+        multiDexEnabled true
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
+
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //for mvp-lce
+    implementation group: 'com.hannesdorfmann.mosby3', name: 'mvp-conductor', version: '3.1.0'
+
+    //for Rx-binding
+    implementation 'com.jakewharton.rxbinding2:rxbinding:2.0.0'
+
+    //for RxJava
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.9'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+
+    //firebase authentication
+    implementation 'com.google.firebase:firebase-auth:19.3.1'
+
+    //dagger related dependencies
+    implementation 'com.google.dagger:dagger:2.10'
+    annotationProcessor 'com.google.dagger:dagger-compiler:2.10'
+
+    //for volley library
+    implementation 'com.android.volley:volley:1.1.1'
+
+    //for recyclerview
+    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'com.google.android.material:material:1.0.0'
+
+    //for constraint layout
+    implementation "androidx.constraintlayout:constraintlayout:2.0.0-beta6"
+
+    //for Glide library
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+
+    //for EventBus
+    implementation 'org.greenrobot:eventbus:3.2.0'
+
+    //for google play services
+    implementation 'com.google.android.gms:play-services-maps:17.0.0'
+
+    //for google maps direction api
+    implementation 'com.google.maps:google-maps-services:0.1.20'
+
+    //for PolyUtil and other Google map utilities to decode and encode poly lines
+    implementation 'com.google.maps.android:android-maps-utils:2.0.1'
+
+    //for Location Services
+    implementation 'com.google.android.gms:play-services-location:17.0.0'
+
+    implementation 'com.android.support:multidex:1.0.3'
+}
